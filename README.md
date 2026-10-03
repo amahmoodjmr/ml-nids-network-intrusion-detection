@@ -17,7 +17,7 @@
 
 ## Abstract
 
-Signature-based intrusion detection systems are structurally unable to detect attacks whose signatures have not yet been recorded, leaving networks exposed to novel and evolving threats. This project designs, implements, and critically evaluates a machine learning-based Network Intrusion Detection System (ML-NIDS) that classifies network traffic as *normal* or *malicious*. Three supervised classifiers — Logistic Regression, Decision Tree, and Random Forest — are trained on the NSL-KDD benchmark dataset under a consistent preprocessing pipeline and evaluated using accuracy, precision, recall, and F1-score, under **both** the official train/test partition and 5-fold cross-validation. The two protocols produce markedly different results (e.g. Decision Tree: 78.85% accuracy on the held-out test set vs. 99.80% under cross-validation), a gap traced to attack types present in the test set but entirely absent from training, and to the persistent difficulty of detecting Remote-to-Local (R2L) attacks. The best-performing model is deployed in a lightweight Flask web application that classifies uploaded traffic in real time. The project's core contribution is methodological: it demonstrates empirically that reported IDS performance is inseparable from the evaluation protocol used to produce it, and that this distinction is frequently obscured in applied machine learning work.
+Signature-based intrusion detection systems are structurally unable to detect attacks whose signatures have not yet been recorded, leaving networks exposed to novel and evolving threats. This project designs, implements, and critically evaluates a machine learning-based Network Intrusion Detection System (ML-NIDS) that classifies network traffic as *normal* or *malicious*. Three supervised classifiers Logistic Regression, Decision Tree, and Random Forest are trained on the NSL-KDD benchmark dataset under a consistent preprocessing pipeline and evaluated using accuracy, precision, recall, and F1-score, under **both** the official train/test partition and 5-fold cross-validation. The two protocols produce markedly different results (e.g. Decision Tree: 78.85% accuracy on the held-out test set vs. 99.80% under cross-validation), a gap traced to attack types present in the test set but entirely absent from training, and to the persistent difficulty of detecting Remote-to-Local (R2L) attacks. The best-performing model is deployed in a lightweight Flask web application that classifies uploaded traffic in real time. The project's core contribution is methodological: it demonstrates empirically that reported IDS performance is inseparable from the evaluation protocol used to produce it, and that this distinction is frequently obscured in applied machine learning work.
 
 ## Motivation
 
@@ -103,8 +103,8 @@ This project uses **NSL-KDD**, an improved version of the KDD Cup 1999 dataset t
 ### 1. Clone and set up the environment
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/amahmoodjmr/ml-nids-network-intrusion-detection.git
+cd https://github.com/amahmoodjmr/ml-nids-network-intrusion-detection.git
 python -m venv venv
 source venv/bin/activate      # on Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -148,7 +148,7 @@ If you reference this work, please cite it as:
   author       = {Abubakar Mahmood Muhammad},
   title        = {ML-NIDS: A Machine Learning-Based Network Intrusion Detection System},
   year         = {2026},
-  howpublished = {\url{https://github.com/<your-username>/<your-repo-name>}},
+  howpublished = {\url{https://github.com/amahmoodjmr/ml-nids-network-intrusion-detection.git>}},
   note         = {Final year project, Department of Cyber Security, Federal University Dutse, Jigawa State}
 }
 ```
