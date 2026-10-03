@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NIDS — Network Intrusion Detection System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1e293b;
+      padding: 20px 40px;
+      border-bottom: 2px solid #3b82f6;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 1.5rem; color: #60a5fa; }
+    header p  { font-size: 0.85rem; color: #94a3b8; }
+
+    .container { max-width: 960px; margin: 40px auto; padding: 0 20px; }
+
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid #334155;
+    }
+    .card h2 { color: #60a5fa; margin-bottom: 16px; font-size: 1.1rem; }
+
+    .upload-area {
+      border: 2px dashed #3b82f6;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .upload-area:hover { background: #1a2744; }
+    .upload-area input { display: none; }
+    .upload-area label {
+      cursor: pointer;
+      display: block;
+      font-size: 1rem;
+      color: #93c5fd;
+    }
+    .upload-area p { color: #64748b; font-size: 0.85rem; margin-top: 8px; }
+
+    #file-name {
+      margin-top: 12px;
+      color: #34d399;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+    }
+    .btn:hover    { background: #2563eb; }
+    .btn:disabled { background: #475569; cursor: not-allowed; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+    .stat .val { font-size: 2rem; font-weight: bold; }
+    .stat .lbl { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+    .stat.total   .val { color: #60a5fa; }
+    .stat.attacks .val { color: #f87171; }
+    .stat.normal  .val { color: #34d399; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #0f172a;
+      color: #60a5fa;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+    }
+    tr:hover td { background: #1a2744; }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .badge.danger  { background: #7f1d1d; color: #fca5a5; }
+    .badge.success { background: #14532d; color: #86efac; }
+
+    .conf-bar {
+      background: #334155;
+      border-radius: 4px;
+      height: 8px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .conf-fill {
+      height: 8px;
+      border-radius: 4px;
+      background: #3b82f6;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 20px;
+      color: #60a5fa;
+      display: none;
+    }
+    #error-box {
+      background: #7f1d1d;
+      color: #fca5a5;
+      padding: 14px;
+      border-radius: 8px;
+      display: none;
+      margin-top: 12px;
+    }
+    #results-section { display: none; }
+
+    .charts img {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 12px;
+      border: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🛡️ Network Intrusion Detection System</h1>
+    <p>ML-Based Detection using Random Forest · NSL-KDD Dataset</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Upload Card -->
+  <div class="card">
+    <h2>📁 Upload Network Traffic Data (CSV)</h2>
+    <div class="upload-area" onclick="document.getElementById('csv-file').click()">
+      <label>Click to select a CSV file</label>
+      <p>The file should contain NSL-KDD formatted network traffic records</p>
+      <input type="file" id="csv-file" accept=".csv" onchange="showFileName(this)"/>
+    </div>
+    <div id="file-name"></div>
+    <button class="btn" id="predict-btn" onclick="predict()" disabled>
+      🔍 Analyse Traffic
+    </button>
+    <div id="error-box"></div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading">⏳ Analysing traffic... please wait</div>
+
+  <!-- Results -->
+  <div id="results-section">
+    <div class="summary-grid">
+      <div class="stat total">
+        <div class="val" id="s-total">0</div>
+        <div class="lbl">Total Records</div>
+      </div>
+      <div class="stat attacks">
+        <div class="val" id="s-attacks">0</div>
+        <div class="lbl">Attacks Detected</div>
+      </div>
+      <div class="stat normal">
+        <div class="val" id="s-normal">0</div>
+        <div class="lbl">Normal Traffic</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Detection Results</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Prediction</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Charts -->
+    <div class="card charts">
+      <h2>📊 Model Performance Charts</h2>
+      <img src="/static/model_comparison.png"  alt="Model Comparison"/>
+      <img src="/static/feature_importance.png" alt="Feature Importance"/>
+      <img src="/static/cm_random_forest.png"   alt="Confusion Matrix"/>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showFileName(input) {
+    const name = input.files[0]?.name || '';
+    document.getElementById('file-name').textContent = name ? `📄 ${name}` : '';
+    document.getElementById('predict-btn').disabled = !name;
+  }
+
+  async function predict() {
+    const file = document.getElementById('csv-file').files[0];
+    if (!file) return;
+
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('error-box').style.display = 'none';
+    document.getElementById('predict-btn').disabled = true;
+
+    const form = new FormData();
+    form.append('file', file);
+
+    try {
+      const res  = await fetch('/predict', { method: 'POST', body: form });
+      const data = await res.json();
+
+      if (data.error) throw new Error(data.error);
+
+      // Summary
+      document.getElementById('s-total').textContent   = data.summary.total;
+      document.getElementById('s-attacks').textContent = data.summary.attacks;
+      document.getElementById('s-normal').textContent  = data.summary.normal;
+
+      // Table
+      const tbody = document.getElementById('results-body');
+      tbody.innerHTML = '';
+      data.results.forEach(r => {
+        const pct = parseFloat(r.confidence);
+        tbody.innerHTML += `
+          <tr>
+            <td>${r.row}</td>
+            <td><span class="badge ${r.status}">${r.prediction}</span></td>
+            <td>
+              ${r.confidence}
+              <div class="conf-bar">
+                <div class="conf-fill" style="width:${pct}%"></div>
+              </div>
+            </td>
+          </tr>`;
+      });
+
+      document.getElementById('results-section').style.display = 'block';
+    } catch (err) {
+      const box = document.getElementById('error-box');
+      box.textContent = '❌ Error: ' + err.message;
+      box.style.display = 'block';
+    } finally {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('predict-btn').disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>

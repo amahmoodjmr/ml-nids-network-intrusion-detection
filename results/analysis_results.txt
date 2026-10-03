@@ -1,0 +1,187 @@
+======================================================================
+LOADING DATA AND MODELS
+======================================================================
+Raw CSV labels line up with saved arrays. OK
+
+======================================================================
+1. TRAINING SET LABEL COUNTS (for Table 4.3)
+======================================================================
+                 Count Category
+41                             
+normal           67343   Normal
+neptune          41214      DoS
+satan             3633    Probe
+ipsweep           3599    Probe
+portsweep         2931    Probe
+smurf             2646      DoS
+nmap              1493    Probe
+back               956      DoS
+teardrop           892      DoS
+warezclient        890      R2L
+pod                201      DoS
+guess_passwd        53      R2L
+buffer_overflow     30      U2R
+warezmaster         20      R2L
+land                18      DoS
+imap                11      R2L
+rootkit             10      U2R
+loadmodule           9      U2R
+ftp_write            8      R2L
+multihop             7      R2L
+phf                  4      R2L
+perl                 3      U2R
+spy                  2      R2L
+
+Category totals (train):
+41
+Normal    67343
+DoS       45927
+Probe     11656
+R2L         995
+U2R          52
+
+Category totals (test):
+41
+Normal    9711
+DoS       7458
+R2L       2887
+Probe     2421
+U2R         67
+
+Attack types present in KDDTest+ but ABSENT from KDDTrain+ (17): ['apache2', 'httptunnel', 'mailbomb', 'mscan', 'named', 'processtable', 'ps', 'saint', 'sendmail', 'snmpgetattack', 'snmpguess', 'sqlattack', 'udpstorm', 'worm', 'xlock', 'xsnoop', 'xterm']
+Test records belonging to those unseen types: 3750 (16.63% of test set)
+
+======================================================================
+2. EXACT TEST-SET METRICS AND CONFUSION MATRICES
+======================================================================
+              Model  Accuracy  Precision  Recall     F1   TP   TN  FP   FN  FP rate  FN rate (miss rate)
+Logistic Regression    0.7539     0.9252  0.6176 0.7407 7926 9070 641 4907   0.0660               0.3824
+      Decision Tree    0.7885     0.9665  0.6511 0.7781 8356 9421 290 4477   0.0299               0.3489
+      Random Forest    0.7707     0.9662  0.6188 0.7544 7941 9433 278 4892   0.0286               0.3812
+
+======================================================================
+3. TRAINING vs TEST ACCURACY (overfitting check)
+======================================================================
+              Model  Train accuracy  Test accuracy    Gap
+Logistic Regression          0.9540         0.7539 0.2001
+      Decision Tree          0.9999         0.7885 0.2114
+      Random Forest          0.9999         0.7707 0.2293
+
+======================================================================
+4. PER-ATTACK-TYPE RECALL ON KDDTest+ (detected / total)
+======================================================================
+    Attack type Category  Test count  Train count  Logistic Regression recall  Decision Tree recall  Random Forest recall
+        neptune      DoS        4657        41214                      0.9985                0.9996                0.9996
+   guess_passwd      R2L        1231           53                      0.0073                0.1389                0.0000
+          mscan    Probe         996            0                      0.3414                0.4076                0.5090
+    warezmaster      R2L         944           20                      0.3528                0.1949                0.0879
+        apache2      DoS         737            0                      0.2768                0.3745                0.2008
+          satan    Probe         735         3633                      0.9864                0.9973                1.0000
+   processtable      DoS         685            0                      0.3679                0.4526                0.0307
+          smurf      DoS         665         2646                      1.0000                1.0000                1.0000
+           back      DoS         359          956                      0.0167                0.4708                0.9749
+      snmpguess      R2L         331            0                      0.0091                0.0000                0.0000
+          saint    Probe         319            0                      0.9154                0.9906                0.9875
+       mailbomb      DoS         293            0                      0.0000                0.0000                0.0000
+  snmpgetattack      R2L         178            0                      0.0000                0.0000                0.0000
+      portsweep    Probe         157         2931                      0.9299                0.9873                1.0000
+        ipsweep    Probe         141         3599                      0.9858                1.0000                1.0000
+     httptunnel      R2L         133            0                      0.0301                0.1429                0.1278
+           nmap    Probe          73         1493                      1.0000                0.9726                1.0000
+            pod      DoS          41          201                      0.9512                0.9268                0.9268
+buffer_overflow      U2R          20           30                      0.6500                0.3000                0.1000
+       multihop      R2L          18            7                      0.0556                0.1667                0.1111
+          named      R2L          17            0                      0.1765                0.3529                0.1765
+             ps      U2R          15            0                      0.2000                0.4000                0.1333
+       sendmail      R2L          14            0                      0.1429                0.0000                0.0000
+          xterm      U2R          13            0                      0.3846                0.3077                0.2308
+        rootkit      U2R          13           10                      0.0769                0.0769                0.0000
+       teardrop      DoS          12          892                      1.0000                1.0000                1.0000
+          xlock      R2L           9            0                      0.0000                0.0000                0.0000
+           land      DoS           7           18                      0.5714                0.1429                0.7143
+         xsnoop      R2L           4            0                      0.2500                0.2500                0.2500
+      ftp_write      R2L           3            8                      0.0000                0.3333                0.3333
+            phf      R2L           2            4                      0.0000                0.5000                0.5000
+     loadmodule      U2R           2            9                      0.5000                0.0000                0.0000
+           perl      U2R           2            3                      0.0000                0.5000                0.5000
+       udpstorm      DoS           2            0                      0.0000                0.5000                1.0000
+      sqlattack      U2R           2            0                      0.0000                1.0000                0.5000
+           worm      R2L           2            0                      0.0000                0.0000                0.0000
+           imap      R2L           1           11                      0.0000                1.0000                0.0000
+
+RECALL BY ATTACK CATEGORY (DoS / Probe / R2L / U2R):
+Category  Test count  Logistic Regression recall  Decision Tree recall  Random Forest recall
+     DoS        7458                      0.7820                0.8215                0.7906
+   Probe        2421                      0.7084                0.7526                0.7964
+     R2L        2887                      0.1233                0.1340                0.0374
+     U2R          67                      0.3433                0.2985                0.1343
+
+Recall on attacks of types UNSEEN in training:
+  Logistic Regression: 0.2957 (3750 records)
+  Decision Tree: 0.3592 (3750 records)
+  Random Forest: 0.2720 (3750 records)
+Recall on attacks of types SEEN in training:
+  Logistic Regression: 0.7505 (9083 records)
+  Decision Tree: 0.7717 (9083 records)
+  Random Forest: 0.7620 (9083 records)
+
+======================================================================
+5. TOP 15 RANDOM FOREST FEATURE IMPORTANCES (exact, for Table 4.11)
+======================================================================
+ Rank                     Feature  Importance
+    1                   src_bytes      0.1952
+    2                   dst_bytes      0.1000
+    3               same_srv_rate      0.0818
+    4      dst_host_same_srv_rate      0.0686
+    5                        flag      0.0665
+    6          dst_host_srv_count      0.0652
+    7                   logged_in      0.0525
+    8             srv_serror_rate      0.0399
+    9               diff_srv_rate      0.0358
+   10               protocol_type      0.0325
+   11                     service      0.0289
+   12                       count      0.0279
+   13                 serror_rate      0.0273
+   14      dst_host_diff_srv_rate      0.0271
+   15 dst_host_same_src_port_rate      0.0255
+
+======================================================================
+6. RANDOM FOREST: EFFECT OF LOWERING THE ATTACK-PROBABILITY THRESHOLD
+======================================================================
+ Threshold  Accuracy  Precision  Recall     F1  FP   FN
+      0.50    0.7731     0.9663  0.6232 0.7577 279 4836
+      0.45    0.7929     0.9669  0.6587 0.7836 289 4380
+      0.40    0.8058     0.9669  0.6823 0.8000 300 4077
+      0.35    0.8173     0.9670  0.7031 0.8142 308 3810
+      0.30    0.8255     0.9664  0.7183 0.8241 320 3615
+      0.25    0.8395     0.9655  0.7446 0.8408 341 3277
+      0.20    0.8562     0.9640  0.7764 0.8601 372 2869
+      0.10    0.8840     0.9270  0.8643 0.8945 874 1742
+
+======================================================================
+7. 5-FOLD STRATIFIED CROSS-VALIDATION ON KDDTrain+ ONLY
+======================================================================
+(Same hyperparameters as the main experiments. Takes a few minutes.)
+Note: the scaler and encoders were fitted on the full training file, so
+there is minor preprocessing leakage across folds; this does not change
+the qualitative conclusion for tree-based models.
+
+Cross-validating Logistic Regression ...
+Cross-validating Decision Tree ...
+Cross-validating Random Forest ...
+
+              Model  Accuracy mean  Accuracy std  Precision mean  Precision std  Recall mean  Recall std  F1 mean  F1 std
+Logistic Regression         0.9538        0.0023          0.9599         0.0018       0.9401      0.0041   0.9499  0.0026
+      Decision Tree         0.9980        0.0002          0.9980         0.0002       0.9977      0.0004   0.9978  0.0002
+      Random Forest         0.9989        0.0002          0.9995         0.0002       0.9982      0.0004   0.9988  0.0002
+
+======================================================================
+8. SUMMARY: CROSS-VALIDATION (train) vs OFFICIAL TEST SET (KDDTest+)
+======================================================================
+              Model  CV accuracy (train)  KDDTest+ accuracy  CV recall (train)  KDDTest+ recall
+Logistic Regression               0.9538             0.7539             0.9401           0.6176
+      Decision Tree               0.9980             0.7885             0.9977           0.6511
+      Random Forest               0.9989             0.7707             0.9982           0.6188
+
+DONE. All tables saved in the results/ folder.
+Please send me: results/analysis_results.txt (or screenshots of it).
